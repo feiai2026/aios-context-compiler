@@ -1,0 +1,54 @@
+name: Publish English collaboration discussion
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "community/partner-search-en.md"
+      - ".github/workflows/publish-discussion-en.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  discussions: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create the discussion once
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          title="$(sed -n '1s/^# //p' community/partner-search-en.md)"
+          body="$(tail -n +2 community/partner-search-en.md | sed '1{/^$/d;}')"
+          metadata="$(
+            gh api graphql \
+              -f query='query($owner:String!,$name:String!){repository(owner:$owner,name:$name){id discussionCategories(first:100){nodes{id slug}} discussions(first:100){nodes{title url}}}}' \
+              -f owner='${{ github.repository_owner }}' \
+              -f name='${{ github.event.repository.name }}'
+          )"
+          repository_id="$(jq -r '.data.repository.id' <<<"$metadata")"
+          category_id="$(jq -r '.data.repository.discussionCategories.nodes[] | select(.slug == "general") | .id' <<<"$metadata")"
+          existing_url="$(jq -r --arg title "$title" '[.data.repository.discussions.nodes[] | select(.title == $title) | .url][0] // "-"' <<<"$metadata")"
+
+          if [[ "$existing_url" != "-" ]]; then
+            echo "Discussion already exists: $existing_url" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          url="$(
+            gh api graphql \
+              -f query='mutation($repositoryId:ID!,$categoryId:ID!,$title:String!,$body:String!){createDiscussion(input:{repositoryId:$repositoryId,categoryId:$categoryId,title:$title,body:$body}){discussion{url}}}' \
+              -f repositoryId="$repository_id" \
+              -f categoryId="$category_id" \
+              -f title="$title" \
+              -f body="$body" \
+              --jq '.data.createDiscussion.discussion.url'
+          )"
+
+          echo "Published: $url" >> "$GITHUB_STEP_SUMMARY"
