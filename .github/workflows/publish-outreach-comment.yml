@@ -1,0 +1,49 @@
+name: Publish targeted design-review invitation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "community/outreach-wave-1.md"
+      - ".github/workflows/publish-outreach-comment.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  discussions: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add the invitation once
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          body="$(cat community/outreach-wave-1.md)"
+          metadata="$(
+            gh api graphql \
+              -f query='query($owner:String!,$name:String!){repository(owner:$owner,name:$name){discussion(number:1){id url comments(first:100){nodes{body}}}}}' \
+              -f owner='${{ github.repository_owner }}' \
+              -f name='${{ github.event.repository.name }}'
+          )"
+          discussion_id="$(jq -r '.data.repository.discussion.id' <<<"$metadata")"
+          discussion_url="$(jq -r '.data.repository.discussion.url' <<<"$metadata")"
+
+          if jq -e '[.data.repository.discussion.comments.nodes[].body | contains("<!-- outreach-wave-1 -->")] | any' <<<"$metadata" >/dev/null; then
+            echo "Invitation already exists: $discussion_url" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          comment_url="$(
+            gh api graphql \
+              -f query='mutation($discussionId:ID!,$body:String!){addDiscussionComment(input:{discussionId:$discussionId,body:$body}){comment{url}}}' \
+              -f discussionId="$discussion_id" \
+              -f body="$body" \
+              --jq '.data.addDiscussionComment.comment.url'
+          )"
+          echo "Published: $comment_url" >> "$GITHUB_STEP_SUMMARY"
