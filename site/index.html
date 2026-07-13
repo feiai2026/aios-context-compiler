@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AIOS Context Compiler：让编码 Agent 在每一步工作前拿到更少但更正确的上下文。">
+  <title>AIOS Context Compiler</title>
+  <style>
+    :root {
+      --ink: #14213d;
+      --muted: #526078;
+      --line: #d9e1ed;
+      --paper: #ffffff;
+      --soft: #f5f7fb;
+      --blue: #175cd3;
+      --teal: #087e8b;
+      --amber: #c26a13;
+      --green: #18794e;
+      --danger: #b42318;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      line-height: 1.68;
+      letter-spacing: 0;
+    }
+    a { color: inherit; }
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 58px;
+      padding: 0 5vw;
+      border-bottom: 1px solid rgba(217, 225, 237, .85);
+      background: rgba(255, 255, 255, .94);
+      backdrop-filter: blur(12px);
+    }
+    .brand { font-weight: 760; }
+    .nav-links { display: flex; gap: 24px; font-size: 14px; color: var(--muted); }
+    .nav-links a { text-decoration: none; }
+    .hero {
+      position: relative;
+      display: flex;
+      align-items: center;
+      min-height: calc(92vh - 58px);
+      padding: 10vh 6vw 13vh;
+      overflow: hidden;
+      background: #f7faff url("assets/context-compiler.png") center / cover no-repeat;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,.98) 0%, rgba(255,255,255,.9) 36%, rgba(255,255,255,.15) 72%, rgba(255,255,255,0) 100%);
+    }
+    .hero-copy { position: relative; z-index: 1; max-width: 690px; }
+    .eyebrow { color: var(--blue); font-size: 14px; font-weight: 760; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 660px; margin-bottom: 22px; font-size: clamp(44px, 6vw, 76px); line-height: 1.04; }
+    h2 { margin-bottom: 14px; font-size: 34px; line-height: 1.2; }
+    h3 { margin-bottom: 8px; font-size: 19px; }
+    .lead { max-width: 620px; margin-bottom: 28px; color: #33415c; font-size: 21px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 18px;
+      border: 1px solid var(--blue);
+      border-radius: 6px;
+      background: var(--blue);
+      color: white;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .button.secondary { background: white; color: var(--blue); }
+    main section { padding: 88px 6vw; }
+    .inner { max-width: 1160px; margin: 0 auto; }
+    .section-intro { max-width: 760px; margin-bottom: 36px; color: var(--muted); font-size: 18px; }
+    .problem-band { background: var(--ink); color: white; }
+    .problem-band .section-intro { color: #cbd5e1; }
+    .problem-grid, .role-grid, .evidence-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .problem { padding: 24px 0; border-top: 3px solid #68c6cf; }
+    .problem:nth-child(2) { border-color: #ffb85c; }
+    .problem:nth-child(3) { border-color: #7ed6a5; }
+    .problem p { color: #d8e0eb; }
+    .pipeline { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 38px; }
+    .stage { padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: white; }
+    .stage-num { display: block; margin-bottom: 18px; color: var(--blue); font-size: 28px; font-weight: 800; }
+    .stage:nth-child(2) .stage-num { color: var(--teal); }
+    .stage:nth-child(3) .stage-num { color: var(--amber); }
+    .stage p { margin-bottom: 0; color: var(--muted); }
+    .visual-band { padding: 0; background: var(--soft); }
+    .visual-band img { display: block; width: 100%; max-height: 760px; object-fit: contain; }
+    .evidence { background: var(--soft); }
+    .stat { padding: 24px; border-left: 4px solid var(--blue); background: white; }
+    .stat strong { display: block; margin-bottom: 4px; font-size: 30px; }
+    .stat:nth-child(2) { border-color: var(--green); }
+    .stat:nth-child(3) { border-color: var(--amber); }
+    .truth {
+      margin-top: 28px;
+      padding: 20px 22px;
+      border: 1px solid #f2b8b5;
+      border-radius: 6px;
+      background: #fff7f6;
+      color: #6f201a;
+    }
+    .role { padding: 24px; border: 1px solid var(--line); border-radius: 8px; }
+    .role ul { padding-left: 20px; color: var(--muted); }
+    .role-grid { grid-template-columns: repeat(2, 1fr); }
+    .next-step { padding: 88px 6vw; background: #0f766e; color: white; text-align: center; }
+    .next-step p { max-width: 680px; margin: 0 auto 28px; color: #d4f4ee; font-size: 18px; }
+    .next-step .button { border-color: white; background: white; color: #0f5f59; }
+    footer { padding: 28px 6vw; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    @media (max-width: 820px) {
+      .nav-links { display: none; }
+      .hero { min-height: 82vh; padding-top: 80px; background-position: 63% center; }
+      .hero::after { background: rgba(255,255,255,.88); }
+      h1 { font-size: 44px; }
+      .lead { font-size: 18px; }
+      main section { padding: 64px 6vw; }
+      .problem-grid, .pipeline, .evidence-grid, .role-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="brand">AIOS Context Compiler</div>
+    <div class="nav-links">
+      <a href="#problem">问题</a>
+      <a href="#approach">方案</a>
+      <a href="#evidence">证据</a>
+      <a href="#join">合作</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">AIOS / Agent Runtime</div>
+      <h1>Context Compiler</h1>
+      <p class="lead">让编码 Agent 在每一步工作前，拿到更少但更正确的上下文。我们正在寻找工程师，一起把这个假设做成可证伪、可复现的 OpenCode 原型。</p>
+      <div class="actions">
+        <a class="button" href="../COLLABORATE.md">参与设计与开发</a>
+        <a class="button secondary" href="../docs/PRODUCT_BRIEF.zh-CN.md">阅读一页方案</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="problem" class="problem-band">
+      <div class="inner">
+        <h2>模型越来越强，Agent 仍会用错上下文</h2>
+        <p class="section-intro">问题不只是 Token 太多，而是外部知识没有在正确时间，以正确粒度进入正确的模型调用。</p>
+        <div class="problem-grid">
+          <article class="problem"><h3>关键内容漏掉</h3><p>规则、历史决策和失败经验明明存在，Agent 仍会错过，甚至不知道自己缺少信息。</p></article>
+          <article class="problem"><h3>噪声持续膨胀</h3><p>AGENTS、Skills、Memory、工具定义和历史会话不断常驻，模型读得更多，却不一定做得更对。</p></article>
+          <article class="problem"><h3>错误无法归因</h3><p>每轮真实上下文不可见，用户无法判断失败来自模型、检索、旧知识还是执行过程。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="approach">
+      <div class="inner">
+        <h2>先选择，再读取，再执行</h2>
+        <p class="section-intro">AIOS 不把所有文件直接拼进 Prompt。它提供受控流程和源文件，模型负责判断与蒸馏，系统负责隔离、追溯和验证。</p>
+        <div class="pipeline">
+          <article class="stage"><span class="stage-num">01</span><h3>Intent Pass</h3><p>只看用户消息、极简环境和源文件目录，形成任务契约、关键假设与读取计划。</p></article>
+          <article class="stage"><span class="stage-num">02</span><h3>Compile Pass</h3><p>只读取计划选中的文件片段，编译为短而可追溯的 Task Context Package。</p></article>
+          <article class="stage"><span class="stage-num">03</span><h3>Execution Pass</h3><p>新执行阶段只接收任务、编译结果和按需工具；每轮输入、Token 与结果完整留痕。</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="visual-band" aria-label="Context Compiler 示意图">
+      <img src="assets/task-context-package.png" alt="Task Context Package 结构示意">
+    </section>
+
+    <section id="evidence" class="evidence">
+      <div class="inner">
+        <h2>从真实失败开始，不从概念开始</h2>
+        <p class="section-intro">我们审阅了多种 Agent 工具的真实对话、执行轨迹和项目事故，产品问题已有充分证据；核心技术效果仍需共同验证。</p>
+        <div class="evidence-grid">
+          <div class="stat"><strong>2,033</strong>条去重用户消息</div>
+          <div class="stat"><strong>128</strong>个真实使用问题</div>
+          <div class="stat"><strong>5+</strong>类 Agent 工具记录</div>
+        </div>
+        <div class="truth"><strong>诚实边界：</strong>已有实验只证明人工精简上下文能降低 Token；尚未证明自动上下文编译能提升复杂任务成功率。我们寻找的是愿意把这个问题真正做完、测准的人。</div>
+      </div>
+    </section>
+
+    <section id="join">
+      <div class="inner">
+        <h2>寻找两类技术伙伴</h2>
+        <p class="section-intro">可以先从一次设计评审或两周可证伪原型开始，再决定开源共同维护、项目制合作或长期合伙。</p>
+        <div class="role-grid">
+          <article class="role"><h3>Agent Runtime / OpenCode</h3><ul><li>TypeScript / Node.js</li><li>Agent loop、message pipeline、tool calling</li><li>插件或内核扩展、Trace 与测试</li></ul></article>
+          <article class="role"><h3>Context / Evaluation</h3><ul><li>上下文工程、检索、Memory 或 RAG</li><li>Agent Eval、实验隔离与可复现评测</li><li>能把“Token 更少”和“任务更好”分开验证</li></ul></article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <section class="next-step">
+    <h2>先反驳，再一起验证</h2>
+    <p>告诉我们：这个方案最可能在哪一步失败？一个有依据的反对意见，比一段泛泛的自我介绍更有价值。</p>
+    <a class="button" href="../COLLABORATE.md">查看合作方式</a>
+  </section>
+
+  <footer>AIOS Context Compiler · Product hypothesis, evidence, and an open engineering challenge.</footer>
+</body>
+</html>
