@@ -40,13 +40,16 @@ jobs:
           publish_issue() {
             local file="$1"
             local extra_label="$2"
-            local title body existing
+            local title body existing number url
             title="$(sed -n '1s/^# //p' "$file")"
             body="$(tail -n +2 "$file" | sed '1{/^$/d;}')"
-            existing="$(gh issue list --state all --search "in:title $title" --json title,url --jq ".[] | select(.title == \"$title\") | .url" | head -n 1)"
+            existing="$(gh issue list --state all --label "$extra_label" --json number,url --jq '.[0] // empty')"
 
             if [[ -n "$existing" ]]; then
-              echo "Already exists: $existing" >> "$GITHUB_STEP_SUMMARY"
+              number="$(jq -r '.number' <<<"$existing")"
+              url="$(jq -r '.url' <<<"$existing")"
+              gh issue edit "$number" --title "$title" --body "$body" --add-label "help wanted" --add-label "$extra_label" >/dev/null
+              echo "Updated: $url" >> "$GITHUB_STEP_SUMMARY"
               return
             fi
 

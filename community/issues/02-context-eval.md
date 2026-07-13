@@ -1,38 +1,36 @@
-# Independent Eval：证明上下文编译器到底有没有价值
+# Independent Eval: prove whether the Context Compiler helps / 独立实验验效
 
-## 目标
+## Goal
 
-建立一套独立、可重复、可审计的 A/B Test，让结果能够区分“只是 Token 变少”与“任务真的做得更好”。
+Build an independent, repeatable, auditable A/B test that distinguishes “using fewer tokens” from “doing the task better.”
 
-## 实验边界
+## Experimental boundary
 
-1. 对照组与实验组使用同版本 OpenCode、同模型、同参数和同等干净的独立 Workspace。
-2. 10 个中文任务来自真实 Agent 使用问题，覆盖关键规则遗漏、旧信息误用、无关资料干扰、长文件深部信息、隐藏缺失信息、条件偏好、会话交接等场景。
-3. 每个任务固定事实与验收器，但不要求模型逐字输出固定答案。
-4. 实验设计者不得修改编译器；编译器开发者不得修改冻结任务和验收标准。
-5. 全量保留每轮真实 messages、tools、Token、时间、结果和验证证据。
+1. Control and treatment use the same OpenCode version, model, parameters, and equivalent clean isolated workspaces.
+2. Ten Chinese tasks come from real coding-agent failures: missed rules, stale information, irrelevant-document distraction, facts deep in long files, hidden missing context, conditional preferences, and cross-session handoff.
+3. Each task freezes facts and an evaluator, but does not require the model to reproduce one exact sentence.
+4. The experiment designer cannot modify the compiler; the compiler developer cannot modify frozen tasks or acceptance criteria.
+5. Retain every real request's messages, tools, token usage, timing, result, and verification evidence.
 
-## 核心判断
+## What the conclusion must cover
 
-- **任务质量**：关键约束满足率、严格任务成功率、返工和人工介入。
-- **上下文质量**：关键事实召回、无关/过期信息进入比例、来源可追溯性。
-- **系统代价**：端到端 Token、模型调用次数、耗时和每成功任务成本。
+- **Task quality** — critical-constraint satisfaction, strict task success, rework, and human intervention.
+- **Context quality** — critical-fact recall, irrelevant/stale information inclusion, and source traceability.
+- **System cost** — end-to-end tokens, model calls, latency, and cost per successful task.
 
-主结论必须报告逐任务配对结果、失败案例和置信区间，不能只给平均值，也不能把 Token 下降写成任务成功率提升。
+Report paired per-task outcomes, failures, and uncertainty. Do not report only averages, and do not equate token reduction with improved task success.
 
-## 第一份交付物
+## First deliverable
 
-请独立审查当前产品假设，提交：
+Independently review the hypothesis and submit:
 
-- 3 个最能证伪上下文编译器的任务；
-- 每个任务的事实、干扰项、评分器和失败判定；
-- 如何避免答案泄漏、Workspace 污染和 Judge 偏差；
-- 你认为现有 30 对实验最不能证明什么。
+- three tasks most likely to falsify the Context Compiler;
+- facts, distractors, evaluator, and failure rule for each task;
+- controls against answer leakage, workspace contamination, and Judge bias;
+- the strongest claim that the existing 30-pair experiment **cannot** support.
 
-## 适合谁
+## 中文摘要
 
-做过 Agent Eval、RAG/Context Evaluation、实验平台、可复现基准或模型盲评的工程师。
+目标是通过严格隔离的真实 A/B Test 判断上下文编译器是否提升任务结果，而不只是 Token 更少。第一份交付物是设计 3 个最可能推翻方案的任务，并明确事实、干扰项、评分器、失败条件和防污染措施。
 
-## 合作入口
-
-可以直接在本 Issue 留下实验审查，也可以附上相关项目或论文实现。首次参与不代表任何薪酬、股权、知识产权或排他承诺。
+You may leave the review directly in this Issue and link relevant work. Initial participation does not imply any salary, equity, IP, or exclusivity commitment.

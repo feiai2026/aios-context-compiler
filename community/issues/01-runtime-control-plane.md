@@ -1,32 +1,34 @@
-# Runtime Spike：可开关接管 OpenCode 每轮模型上下文
+# Runtime Spike: fully control every OpenCode model request / 接管每轮上下文
 
-## 目标
+## Goal
 
-用最小可验证改动证明：在 AIOS 开关开启时，OpenCode 的每次模型请求都由一条受控路径组装；关闭时完全保持原生行为。
+Prove with the smallest verifiable change that, when the AIOS switch is on, every OpenCode model request is assembled through one controlled path. When the switch is off, behavior remains fully native.
 
-## 必须证明
+## Required evidence
 
-1. **开关隔离**：同一提交、同一模型和同一 Workspace 下，开关关闭走原生路径，开启严格走 AIOS 路径。
-2. **阶段隔离**：Intent、Compile、Execution 三个阶段真实使用不同输入；Execution 看不到未被选中的项目上下文。
-3. **完整接管**：项目指令、Skills、工具定义、MCP、权限、历史消息和工具结果都不能绕过 AIOS 私自进入请求。
-4. **原始 Trace**：每次模型请求保存实际发送的 messages、tools、来源、Token、耗时、错误和结果。
-5. **失败可见**：AIOS 开启时编译失败必须失败并告警，不静默回退原生上下文。
+1. **Switch isolation** — same commit, model, parameters, and equivalent clean workspace; OFF uses native OpenCode, ON strictly uses AIOS.
+2. **Real stage isolation** — Intent, Compile, and Execution receive different inputs; Execution cannot see project context that the compiler did not select.
+3. **Complete control** — project instructions, skills, tool schemas, MCP, permissions, history, and tool results cannot bypass AIOS and enter a request independently.
+4. **Raw trace** — retain the actual messages, tools, sources, token usage, latency, errors, and result for every model call.
+5. **Visible failure** — when AIOS is enabled, a compiler failure must fail loudly. It must not silently fall back to native context.
 
-## 第一份交付物
+## First deliverable
 
-先提交一份不超过两页的 Runtime 接入评审，回答：
+Submit a design review of no more than two pages answering:
 
-- OpenCode 当前在哪个函数形成最终模型请求；
-- 哪些输入可能绕过统一组装路径；
-- 最小修改点和可证明的测试门禁；
-- 最可能导致“看似接管、实际仍泄漏”的三个风险。
+- Where does current OpenCode form the final provider request?
+- Which inputs can bypass that assembly path?
+- What is the smallest integration point and which tests prove control?
+- What are the three most likely ways to appear isolated while still leaking native context?
 
-评审通过后再做代码 Spike。我们看重可证伪证据，不看大段概念描述。
+Only after the review passes do we build the code Spike. We value falsifiable evidence over a long conceptual proposal.
 
-## 适合谁
+## Good fit
 
-熟悉 TypeScript、OpenCode、Agent loop、message pipeline、tool calling、插件或 Runtime 内核扩展的工程师。
+Engineers familiar with TypeScript, OpenCode, agent loops, message pipelines, tool calling, plugin systems, or runtime internals.
 
-## 合作入口
+## 中文摘要
 
-可以直接在本 Issue 留下评审，也可以附上相关 PR、项目或文章。首次参与不代表任何薪酬、股权、知识产权或排他承诺。
+目标是在显式开关下真正接管 OpenCode 每次发给模型的最终请求，而不是只在原生上下文外面追加一个 Context Package。第一份交付物不是直接写代码，而是用不超过两页说明真实接入点、可能绕过的输入和可证明的测试门禁。
+
+You may leave the review directly in this Issue and link relevant PRs or projects. Initial participation does not imply any salary, equity, IP, or exclusivity commitment.
