@@ -1,0 +1,58 @@
+name: Publish engineering collaboration issues
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "community/issues/**"
+      - ".github/workflows/publish-engineering-issues.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish labels, topics and issues idempotently
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          gh label create "help wanted" --color "008672" --description "Community help is welcome" --force
+          gh label create "runtime" --color "1D76DB" --description "Agent runtime and OpenCode integration" --force
+          gh label create "context-eval" --color "5319E7" --description "Context engineering and independent evaluation" --force
+
+          gh api --method PUT "repos/${{ github.repository }}/topics" \
+            -H "Accept: application/vnd.github+json" \
+            -f 'names[]=agent' \
+            -f 'names[]=context-engineering' \
+            -f 'names[]=opencode' \
+            -f 'names[]=coding-agents' \
+            -f 'names[]=agent-evaluation' >/dev/null \
+            || echo "Topic update skipped; issue publishing will continue." >> "$GITHUB_STEP_SUMMARY"
+
+          publish_issue() {
+            local file="$1"
+            local extra_label="$2"
+            local title body existing
+            title="$(sed -n '1s/^# //p' "$file")"
+            body="$(tail -n +2 "$file" | sed '1{/^$/d;}')"
+            existing="$(gh issue list --state all --search "in:title $title" --json title,url --jq ".[] | select(.title == \"$title\") | .url" | head -n 1)"
+
+            if [[ -n "$existing" ]]; then
+              echo "Already exists: $existing" >> "$GITHUB_STEP_SUMMARY"
+              return
+            fi
+
+            url="$(gh issue create --title "$title" --body "$body" --label "help wanted" --label "$extra_label")"
+            echo "Published: $url" >> "$GITHUB_STEP_SUMMARY"
+          }
+
+          publish_issue "community/issues/01-runtime-control-plane.md" "runtime"
+          publish_issue "community/issues/02-context-eval.md" "context-eval"

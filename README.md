@@ -4,6 +4,13 @@
 
 [中文产品说明](docs/PRODUCT_BRIEF.zh-CN.md) | [English brief](docs/PRODUCT_BRIEF.en.md) | [我们正在找谁](COLLABORATE.md) | [在线演示](site/index.html)
 
+## 直接参与
+
+- **Runtime 方向**：评审并实现 OpenCode 每轮上下文的可开关接管、阶段隔离和完整 Trace。
+- **Context / Eval 方向**：独立设计并执行能检验任务质量、上下文质量与额外成本的严格 A/B Test。
+
+仓库会自动发布这两个首批工程任务。你不必先承诺长期合作，可以先在 Issue 中指出设计漏洞、提交一个最小 Spike，或独立复核实验协议。
+
 ## 我们已经做到什么
 
 在 10 类任务、30 对 A/B 实验和 66 次真实模型调用中，最小 Context Package 取得了：
