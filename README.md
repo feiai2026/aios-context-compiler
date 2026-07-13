@@ -4,6 +4,8 @@
 
 [中文产品说明](docs/PRODUCT_BRIEF.zh-CN.md) | [English brief](docs/PRODUCT_BRIEF.en.md) | [我们正在找谁](COLLABORATE.md) | [在线演示](site/index.html)
 
+[实验聚合数据与边界](evidence/README.md) · [Machine-readable summary](evidence/summary-valid.json)
+
 ## 直接参与
 
 - **Runtime 方向**：评审并实现 OpenCode 每轮上下文的可开关接管、阶段隔离和完整 Trace。

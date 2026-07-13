@@ -34,6 +34,8 @@ However:
 
 The evidence supports the value of context reduction and isolation. It does not yet support a claim that the Context Compiler improves task success.
 
+The machine-readable aggregate is published at [`evidence/summary-valid.json`](../evidence/summary-valid.json), with scope, checksum, and interpretation notes in [`evidence/README.md`](../evidence/README.md).
+
 ## Why publish now
 
 The product problem is well evidenced, while the core implementation question remains open. Publishing at this point is intended to attract engineers who want to test the hypothesis rigorously, not contributors who are asked to trust a success claim.
