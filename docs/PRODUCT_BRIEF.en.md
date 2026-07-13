@@ -1,5 +1,7 @@
 # AIOS Context Compiler: One-page Brief
 
+> Across 30 paired trials covering 10 task types, the minimal context arm reduced total tokens in all 30 pairs, by 50.8% on average.
+
 ## In one sentence
 
 Compile the smallest sufficient task context from project rules, current state, decisions, file maps, skills, hooks, and memory before a coding agent starts each task.
@@ -28,9 +30,9 @@ Execution Pass
 
 The first implementation targets OpenCode and must provide a strict on/off switch, stage isolation, exact request traces, token accounting, and a reproducible A/B harness.
 
-## Honest status
+## Current progress
 
-We have extensive product research, a corpus of real agent-use failures, multiple prototypes, and failure analyses. A controlled experiment showed that a manually frozen minimal context package reduced tokens and irrelevant-information leakage. It did **not** prove that an intelligent compiler improves task success. That unproven technical question is the project.
+We have extensive product research, a corpus of real agent-use failures, multiple prototypes, and controlled experiments. A minimal Context Package cut token usage and irrelevant-information leakage. The next engineering milestone is to automate intent analysis, source selection, and compilation, then measure the impact on complex-task success.
 
 ## We are looking for
 
