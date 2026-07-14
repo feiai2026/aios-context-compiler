@@ -10,6 +10,8 @@ Good first contributions include:
 - review the A/B isolation protocol;
 - contribute a realistic Chinese coding-agent task derived from a reproducible context failure.
 
+For the smallest entry point, use the [one-hour Context Compiler challenge](community/issues/03-one-hour-challenge.md). It requires only one reproducible context bypass or one falsification task.
+
 Please open a Discussion before submitting a large implementation. We want to freeze the product contract and acceptance gates before building another partial prototype.
 
 ## Working principles
