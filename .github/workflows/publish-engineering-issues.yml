@@ -27,6 +27,7 @@ jobs:
           gh label create "help wanted" --color "008672" --description "Community help is welcome" --force
           gh label create "runtime" --color "1D76DB" --description "Agent runtime and OpenCode integration" --force
           gh label create "context-eval" --color "5319E7" --description "Context engineering and independent evaluation" --force
+          gh label create "starter-challenge" --color "FBCA04" --description "Small independently reviewable first contribution" --force
 
           gh api --method PUT "repos/${{ github.repository }}/topics" \
             -H "Accept: application/vnd.github+json" \
@@ -59,3 +60,4 @@ jobs:
 
           publish_issue "community/issues/01-runtime-control-plane.md" "runtime"
           publish_issue "community/issues/02-context-eval.md" "context-eval"
+          publish_issue "community/issues/03-one-hour-challenge.md" "starter-challenge"
