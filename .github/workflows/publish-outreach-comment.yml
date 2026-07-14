@@ -12,6 +12,8 @@ on:
       - "community/outreach-wave-6.md"
       - "community/outreach-wave-7.md"
       - "community/outreach-wave-8.md"
+      - "community/outreach-wave-9.md"
+      - "community/outreach-wave-10.md"
       - ".github/workflows/publish-outreach-comment.yml"
   workflow_dispatch:
 
@@ -71,3 +73,5 @@ jobs:
           publish_comment "community/outreach-wave-6.md" 4 "<!-- outreach-wave-6 -->"
           publish_comment "community/outreach-wave-7.md" 4 "<!-- outreach-wave-7 -->"
           publish_comment "community/outreach-wave-8.md" 4 "<!-- outreach-wave-8 -->"
+          publish_comment "community/outreach-wave-9.md" 1 "<!-- outreach-wave-9 -->"
+          publish_comment "community/outreach-wave-10.md" 4 "<!-- outreach-wave-10 -->"
